@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lib页面</title>
+    <style>
+        .img {
+            display: block;
+            width: 100px;
+            height: 100px;
+            border: 1px solid red;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <img src="./1.jpg" class="img test" id="img" style="background-color: red;size:12px;" onclick="test" />
+    <script>
+        function test() {
+            return (new Promise((resolve, reject) => {
+                reject(false)
+            }))
+        }
+        let img = document.getElementById("img")
+        img
+    </script>
+</body>
+
+</html>

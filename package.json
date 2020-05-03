@@ -1,0 +1,43 @@
+{
+  "name": "lib",
+  "version": "1.0.0",
+  "description": "个人常用方法集",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -r esm",
+    "start": "node ./cli/dev.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/llorz-o/lib.git"
+  },
+  "keywords": [
+    "lib",
+    "javascript",
+    "util"
+  ],
+  "author": "llorz-o",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/llorz-o/lib/issues"
+  },
+  "homepage": "https://github.com/llorz-o/lib#readme",
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/runtime-corejs2": "^7.9.6",
+    "babel-loader": "^8.1.0",
+    "esm": "^3.2.25",
+    "html-webpack-plugin": "^4.2.1",
+    "mocha": "^7.1.2",
+    "webpack": "^4.43.0",
+    "webpack-dev-server": "^3.10.3"
+  },
+  "dependencies": {
+    "localforage": "^1.7.3",
+    "ua-device": "^0.1.10",
+    "validate.js": "^0.13.1"
+  }
+}
