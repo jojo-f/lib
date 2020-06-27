@@ -109,36 +109,72 @@ class captureError {
     // 用户操作
     behavior = [
         // {
-        //     behaviorType: "",
-        //     touchs: []
+        //     behaviorType: "touch",
+        //     touchs: [{
+        //         clientX: 190.8163299560547
+        //         clientY: 168.36734008789062
+        //         pageX: 190.8163299560547
+        //         pageY: 168.36734008789062
+        //         screenX: 250
+        //         screenY: 424
+        //     }]
         // }
     ]
     snapshoot = {
-        // id: hash(16),
-        // timestamp: new Date().getTime(),
-        // traceId: this.traceId, bug发生前的操作标记
-        // refresh: this.refresh,
-        // errorInfo: {
-        //     errType: "DOMError",
-        //     domPath: string[]，
-        //     message,
-        //     filename,
-        //     lineno,
-        //     colno,
-        //     stack
-        // },
-        // routerInfo: {
-        //     hash,
-        //     host,
-        //     hostname,
-        //     href,
-        //     origin,
-        //     pathname,
-        //     port,
-        //     protocol,
-        //     search
-        // }，
-        // userState：{}
+        // attributes: Array(5)
+        // 0: {name: "src", value: "./1.jpg"}
+        // 1: {name: "class", value: "img test"}
+        // 2: {name: "id", value: "img"}
+        // 3: {name: "style", value: "background-color: red;size:12px;"}
+        // 4: {name: "onclick", value: "test"}
+        // length: 5
+        // availHeight: 667
+        // availWidth: 375
+        // browser: {name: "Safari", version: "13.0.3"}
+        // clientHeight: 100
+        // clientLeft: 1
+        // clientTop: 1
+        // clientWidth: 100
+        // cssText: "background-color: red; size: 12px;"
+        // device: {manufacturer: "Apple", model: "IPHONE", type: "mobile"}
+        // domPath: (3) ["img#img.img.test", "body", "html.cye-disabled.cye-nm"]
+        // downlink: 2.55
+        // effectiveType: "4g"
+        // engine: {name: "Webkit", version: "605.1.15"}
+        // errType: "DOMError"
+        // hash: ""
+        // height: 667
+        // host: "localhost:5000"
+        // hostname: "localhost"
+        // href: "http://localhost:5000/"
+        // id: "0dL3fU0qL62TR8ci"
+        // isOnline: true
+        // layoutHeight: 667
+        // layoutWidth: 375
+        // logType: "error"
+        // offsetHeight: 102
+        // offsetLeft: 8
+        // offsetTop: 8
+        // offsetWidth: 102
+        // origin: "http://localhost:5000"
+        // os: {name: "iOS", version: "13.2.3"}
+        // pathname: "/"
+        // port: "5000"
+        // protocol: "http:"
+        // refresh: true
+        // rtt: 150
+        // scrollHeight: 100
+        // scrollLeft: 0
+        // scrollTop: 0
+        // scrollWidth: 100
+        // search: ""
+        // timestamp: 1589212600126
+        // traceId: "3JL15B4Z"
+        // viewportHeight: 667
+        // viewportWidth: 375
+        // width: 375
+        // x: 8
+        // y: 8
     };
     temporaryDB; // 暂存
     indexDB; // 索引区
@@ -170,14 +206,16 @@ class captureError {
         this.desposeLogWk = new WebWorker(desposeLogWorker)
         this.desposeIndexLog = debounce(this.desposeIndexLog)
         this.init()
+        this.decorator()
         this.listenerUserBehavior()
     }
-
+    // 初始化事件监听
     init() {
         // 侦听全局,捕获模式
         window.addEventListener("error", e => {
             // dom元素上报错
-            if (e.message === undefined || e.error === undefined) {
+            if (e.message === undefined || e.error === undefined || e.path) {
+                console.log(e);
                 let {
                     path,
                     target,
@@ -206,6 +244,7 @@ class captureError {
                     domPath = [],
                     cssText = (style || {}).cssText
                 let _attributes = []
+                attributes = attributes || []
                 for (let index = 0, len = attributes.length; index < len; index++) {
                     const attr = attributes[index];
                     let {
@@ -223,7 +262,7 @@ class captureError {
                         value: value && validate.isNumber(value.length) && Number(value.length) < 200 ? value : ''
                     })
                 }
-                domPath = this.disposeDomPath(path)
+                domPath = this.disposeDomPath(path || [])
 
                 this.disposeErrorInfo({
                     errType: "DOMError",
@@ -295,6 +334,25 @@ class captureError {
         window.addEventListener('online', () => this.isOnline = true);
         window.addEventListener('offline', () => this.isOnline = false);
         // window.navigator.connection.addEventListener("change", e => {})
+        // 网页崩溃
+        window.addEventListener("load", () => {
+            setInterval(() => {
+                this.desposeLogWk.emit("updateCrashTime", new Date().getTime())
+            }, 1000);
+            this.desposeLogWk.emit("inspectCrash")
+        })
+
+    }
+    // 装饰 error 函数
+    decorator() {
+        if (window.console) {
+            if (window.console.error) {
+                let temp = window.console.error
+                window.console.error = function (...args) {
+                    Reflect.apply(temp, this, args)
+                }
+            }
+        }
     }
     // 处理dom路径 
     disposeDomPath(path) {
@@ -327,7 +385,8 @@ class captureError {
         return result
     }
     // 处理错误信息
-    disposeErrorInfo(errorInfo) {
+    disposeErrorInfo(errorInfo = {}) {
+        if (errorInfo.stack) console.error(errorInfo.stack);
         Object.assign(this.snapshoot, errorInfo, {
             logType: "error",
         })
@@ -359,8 +418,10 @@ class captureError {
             userState,
             routerInfo,
             userAgent,
-            browserState)
-        this.temporaryDB.setItem(this.snapshoot.timestamp + '-' + this.snapshoot.id, this.snapshoot)
+            browserState);
+        this.temporaryDB.setItem(this.snapshoot.timestamp + '-' + this.snapshoot.id, this.snapshoot).catch(err => {
+            console.log(err);
+        })
         this.refresh = false
         this.snapshoot = {}
     }

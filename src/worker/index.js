@@ -1,3 +1,4 @@
+import validate from 'validate.js'
 // 注入给每个 worker 的函数
 function injectActions(actions = {}) {
     let prototype = {
@@ -42,11 +43,11 @@ export default function WebWorker(woker) {
             let eventStack = eventPool[event]
             let k = Math.random()
             fn.id = k
-            if (G.isEmpty(eventStack)) {
+            if (validate.isEmpty(eventStack)) {
                 eventPool[event] = {
                     [k]: fn
                 }
-            } else if (G.isObj(eventStack)) {
+            } else if (validate.isObject(eventStack)) {
                 eventPool[event][k] = fn
             } else {
                 console.error(`非法事件:[${event}] 事件堆错误:[${eventPool[event]}]`);
@@ -70,10 +71,10 @@ export default function WebWorker(woker) {
             }
             let flag = true
             try {
-                if (G.isFun(fn) || G.isObj(fn)) {
+                if (validate.isFunction(fn) || validate.isObject(fn)) {
                     delete eventPool[event][fn.id]
                 }
-                if (G.isStr(fn)) {
+                if (validate.isString(fn)) {
                     delete eventPool[event][fn]
                 }
             } catch (error) {
@@ -105,7 +106,7 @@ export default function WebWorker(woker) {
         } = data
 
         if (event) {
-            if (G.isObj(eventPool[event])) {
+            if (validate.isObject(eventPool[event])) {
                 Object.keys(eventPool[event]).forEach(k => {
                     eventPool[event][k](dispatch)
                 })

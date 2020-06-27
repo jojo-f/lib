@@ -10,25 +10,22 @@
 使用token
 */
 
-import './error-capture'
+// import './error-capture'
+import './utils/module'
 
-import {
-    debounce,
-    hash,
-    secure,
-    origin
-} from '../src/utils/fn'
+// import {
+//     debounce,
+//     hash,
+//     secure,
+//     origin
+// } from '../src/utils/fn'
 
-let a = origin({
-    name: 'name',
-    test1() {
-        console.log(12)
-    },
-    test2() {
-        console.log(this.name);
+console.log(F.defined('string', () => ({
+    show() {
+        console.log('show module string')
     }
-})
+})));
 
-a.__test1()
-    .__test2()
-    .name
+F.module(['string.show'], function (show) {
+    show()
+})

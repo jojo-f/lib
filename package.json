@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha -r esm",
-    "start": "node ./cli/dev.js"
+    "start": "node ./cli/dev.js",
+    "build": "node ./cli/build.js"
   },
   "repository": {
     "type": "git",
@@ -33,7 +34,9 @@
     "html-webpack-plugin": "^4.2.1",
     "mocha": "^7.1.2",
     "webpack": "^4.43.0",
-    "webpack-dev-server": "^3.10.3"
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3",
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
     "localforage": "^1.7.3",

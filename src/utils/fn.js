@@ -44,75 +44,6 @@ export const hash = (len = 5) => {
     保证任何调用或取值不会产生报错,
     如果执行过程中取值失败或是函数执行错误都不会引起语法错误,而是转为警告或可判断错误
 */
-// export const secure = (target, ctx = {}) => {
-//     let proxy, r = () => {
-//         // 如果目标值是函数就不会走这里
-//         // 如果走入这里说明target 不是一个函数那么调用错误,清空 __t
-//         // tag warn
-//         proxy.__t = undefined
-//         return proxy
-//     }
-//     if (typeof target === 'function') {
-//         // 目标为函数则直接包装该函数
-//         r = target
-//     } else {
-//         // 目标不为函数则包装 预设函数
-//         r.__t = target
-//     }
-//     proxy = new Proxy(r, {
-//         get(tg, propK, px) {
-
-//             if (propK === '__t') {
-//                 // 自己取值
-//                 return tg.__t
-//             }
-
-//             if (propK === 'val') {
-//                 // 获取结果
-//                 return tg.__t
-//             }
-
-//             if (tg.__t === undefined) {
-//                 // 传入 undefined 说明目标属性早已丢失
-//                 return secure(undefined, ctx)
-//             }
-
-//             let atr = undefined
-
-//             try {
-//                 // 目标值为undefined
-//                 atr = tg.__t[propK]
-//             } catch (error) {
-//                 // tag warn
-//                 atr = undefined
-//             }
-//             // 目标已丢失
-//             return secure(atr, ctx)
-
-//         },
-//         set(tg, propK, val, px) {
-//             if (val === undefined && propK === '__t') {
-//                 return tg.__t = undefined
-//             }
-//             console.error(`安全函数不允许赋值`, tg, propK, val);
-//         },
-//         apply(tg, _ctx, args) {
-//             let res = undefined
-//             ctx = _ctx ? _ctx.val : ctx
-//             try {
-//                 res = Reflect.apply(tg, ctx, args)
-//             } catch (error) {
-
-//             } finally {
-//                 return secure(res, ctx)
-//             }
-
-//         }
-//     })
-
-//     return proxy
-
-// }
 export const secure = (target, ctx = {}, ops = {
     error: false
 }) => {
@@ -200,7 +131,9 @@ export const secure = (target, ctx = {}, ops = {
  *  origin({
  *      a(){ console.log('a') },
  *      b(){ console.log('b') }
- *  }).__a().__b().a()
+ *  })
+ * .__a()
+ * .__b().a()
  *  __ 双下划线的函数将始终指向 origin
  * @param {Object} t 
  */
